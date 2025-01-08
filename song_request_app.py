@@ -17,6 +17,14 @@ songs_df = songs_df.drop_duplicates(subset=['track', 'artist'], keep='first')
 
 print(f"DataFrame after removing duplicates: {songs_df.shape}")
 
+def convert_uri_to_url(uri):
+    if isinstance(uri, str) and uri.startswith("spotify:track:"):
+        track_id = uri.split(":")[2]
+        return f"https://open.spotify.com/track/{track_id}"
+    return None  # Return None for invalid URIs
+
+songs_df['url'] = songs_df['uri'].apply(convert_uri_to_url)
+
 songs_df['decade'] = songs_df['decade'].replace({
     '60s': 1960.0,
     '70s': 1970.0,
@@ -76,7 +84,7 @@ def recommend_songs(song_title, artist_name, num_recommendations=5):
     
     for i in indices.flatten():
         if songs_df.loc[i, 'artist'] != artist_name:
-            recommendations.append((songs_df.loc[i, 'track'], songs_df.loc[i, 'artist'], songs_df.loc[i, 'uri']))
+            recommendations.append((songs_df.loc[i, 'track'], songs_df.loc[i, 'artist'], songs_df.loc[i, 'url']))
         if len(recommendations) >= num_recommendations:
             break
 
