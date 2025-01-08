@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Song Recommendations</title>
+</head>
+<body>
+    <h1>Song Recommendation System</h1>
+    <form method="POST">
+        <label for="song_title">Song Title:</label>
+        <input type="text" id="song_title" name="song_title" required>
+        <br>
+        <label for="artist_name">Artist Name:</label>
+        <input type="text" id="artist_name" name="artist_name" required>
+        <br>
+        <label for="num_recommendations">Number of Recommendations:</label>
+        <input type="number" id="num_recommendations" name="num_recommendations" min="1" max="10" required>
+        <br>
+        <button type="submit">Get Recommendations</button>
+    </form>
+
+    {% if recommendations %}
+        <h2>Recommendations:</h2>
+        <ul>
+            {% for track, artist, link in recommendations %}
+                <li><a href="{{ link }}">{{ track }}</a> by {{ artist }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</body>
+</html>
+<!-- Step 4: Run Your Application
+Run your Flask app by executing the Python file:
+
+python your_flask_app.py
+Replace your_flask_app.py with the name of your Python file.
+
+Step 5: Access the Web App
+Open your web browser and go to http://127.0.0.1:5000/ to access your song recommendation web application.
+
+This setup will allow users to input a song title, artist name, and the number of recommendations they want, and then receive the recommendations with links to Spotify. Make sure your dataset includes a column for Spotify links to make the links functional. -->
