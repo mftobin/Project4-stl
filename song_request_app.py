@@ -1,10 +1,14 @@
-from flask import Flask, render_template, request
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-from sklearn.preprocessing import MinMaxScaler
 from sklearn.neighbors import NearestNeighbors
+from sklearn.preprocessing import MinMaxScaler
 from pathlib import Path
+import matplotlib.pyplot as plt
+import numpy as np
+from sklearn.manifold import TSNE
+import seaborn as sns
+from flask import Flask, render_template, request
 
 app = Flask(__name__)
 
@@ -17,6 +21,8 @@ songs_df = songs_df.drop_duplicates(subset=['track', 'artist'], keep='first')
 
 print(f"DataFrame after removing duplicates: {songs_df.shape}")
 
+songs_df = songs_df.reset_index(drop=True)
+
 def convert_uri_to_url(uri):
     if isinstance(uri, str) and uri.startswith("spotify:track:"):
         track_id = uri.split(":")[2]
@@ -24,6 +30,10 @@ def convert_uri_to_url(uri):
     return None  # Return None for invalid URIs
 
 songs_df['url'] = songs_df['uri'].apply(convert_uri_to_url)
+
+# Normalize dataset columns for searching
+songs_df['track_lower'] = songs_df['track'].str.strip().str.lower()
+songs_df['artist_lower'] = songs_df['artist'].str.strip().str.lower()
 
 songs_df['decade'] = songs_df['decade'].replace({
     '60s': 1960.0,
@@ -47,44 +57,78 @@ features = [
 #  'mode',
 #  'speechiness',
  'acousticness',
- 'instrumentalness',
+#  'instrumentalness',
 #  'liveness',
-#  'valence',
- 'tempo',
+ 'valence',
+#  'tempo',
 #  'duration_ms',
 #  'time_signature',
 #  'chorus_hit',
 #  'sections',
  'popularity',
-#  'decade'
+ 'decade'
  ]
+
+
 X = songs_df[features]
 
-# Scale the features
 scaler = MinMaxScaler()
-X_scaled = scaler.fit_transform(X)
+# Ensure indices of scaled features match songs_df
+X_scaled = pd.DataFrame(
+    scaler.fit_transform(X),
+    columns=features,
+    index=songs_df.index  # Match the original index
+)
+
+# Feature weighting
+weights = {
+    'danceability': 1.3,
+    'energy': 1.8,
+    'acousticness': 0.8,
+    'valence': 1.5,
+    'popularity': 0.5,
+    'decade': 0.4
+}
+
+# Apply the weights to the scaled features
+weighted_features = X_scaled * pd.Series(weights)
 
 # Train a k-Nearest Neighbors model
 model = NearestNeighbors(n_neighbors=15, algorithm='ball_tree') 
-model.fit(X_scaled)
+model.fit(weighted_features)
 
 
 def recommend_songs(song_title, artist_name, num_recommendations=5):
-    # Your existing recommendation code here
     # Make sure to return recommendations instead of printing them
-    recommendations = []
-    song_row = songs_df[(songs_df['track'] == song_title) & (songs_df['artist'] == artist_name)]
+    # Preprocess input
+    song_title = song_title.strip().lower()
+    artist_name = artist_name.strip().lower()
+    
+    # Filter the dataset for the input song and artist with case-insensitive partial matching
+    song_row = songs_df[
+        (songs_df['track_lower'].str.contains(song_title)) & 
+        (songs_df['artist_lower'].str.contains(artist_name))
+    ]
     
     if song_row.empty:
-        return None
+        print(f"Error: Song '{song_title}' by '{artist_name}' not found in the dataset.")
+        return
 
+    # Get the index and weighted features of the input song
     song_index = song_row.index[0]
-    song_features = X_scaled[song_index].reshape(1, -1)
+    song_features = weighted_features.loc[song_index].values.reshape(1, -1)  # Use weighted_features here
+
+    # find nearest neighbors
     distances, indices = model.kneighbors(song_features)
+
+    # Map indices back to the original DataFrame
+    recommendations = []
     
     for i in indices.flatten():
-        if songs_df.loc[i, 'artist'] != artist_name:
-            recommendations.append((songs_df.loc[i, 'track'], songs_df.loc[i, 'artist'], songs_df.loc[i, 'url']))
+        original_index = songs_df.index[i]  # Map to original index
+        if (songs_df.loc[original_index, 'track_lower'] != song_row.iloc[0]['track_lower'] and 
+            songs_df.loc[original_index, 'artist_lower'] != song_row.iloc[0]['artist_lower']):
+            recommendations.append((songs_df.loc[original_index, 'track'], songs_df.loc[original_index, 'artist'], songs_df.loc[original_index, 'url']))
         if len(recommendations) >= num_recommendations:
             break
 
