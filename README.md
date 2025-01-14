@@ -34,6 +34,52 @@ The corresponding dataset contained twenty features:
 ### Procedure
 The dataset was cleaned so that no song duplicates existed. Dummy variables for the categorical feature decades were created. In the end the features that were included in the model were Danceability, Energy, Acousticness, Liveness, Valence, Popularity, and each Decade. After applying weights to each of the features, a K Nearest Neighbors model was created. The model was driven by user input. After a song was entered by the user, provided the song is in the dataset, the 1-10 most similar songs determined by the model were produced. Additionally, an app driven by Flask provided a link to the song on Spotify for the user to listen to.
 
+## Apache Spark SQL in the Project
+In this project, Apache Spark SQL is used to efficiently query and process large datasets with SQL syntax. It enables seamless integration of structured data through Spark DataFrames, allowing complex transformations and analyses across distributed systems.
+# Key Features:
+* DataFrame Integration:
+    Converts a Pandas DataFrame to a Spark DataFrame for distributed processing.
+    ```songs_df = spark.createDataFrame(song_df) ```
+* Temporary Views:
+    Registers a Spark DataFrame as a temporary SQL table for querying.
+    ```songs_df.createOrReplaceTempView("songs")```
+* SQL Queries:
+    Runs SQL queries to transform data, such as converting categorical values (e.g., decades) into numeric values.
+    ```spark.sql("SELECT ... FROM songs")```
+* Efficient Data Processing:
+    Leverages Spark's Catalyst optimizer for efficient query execution on large-scale data.
+    Spark SQL simplifies data manipulation, making it an essential tool for big data analysis with minimal code complexity.
+
+## Preprocessing
+I started by cleaning the dataset and removing duplicate songs. I also added two new columns, 'track_lower' and 'artist_lower' to make searching the song and artist easier in the end function.
+```songs_df['track_lower'] = songs_df['track'].str.strip().str.lower()```
+```songs_df['artist_lower'] = songs_df['artist'].str.strip().str.lower()```
+I used get_dummies on the decade column to create new columns with only 0s and 1s instead of a string, so that the decades can be properly scaled and weighted for machine learning.
+## Scaling Features and Applying Weights
+I choose which features to use and scaled them with the MinMaxScaler, since most of the columns were already between 0 an 1.
+Once scaling, I added weights to each feature. I experimented with the weights until I ended up with this:
+
+weights = {
+    'danceability': 1.0,
+    'energy': 1.5,
+    'acousticness': 1.0,
+    'liveness': 1.0,
+    'valence': 1.5,
+    'popularity': 0.5,
+    'decade_60s': 0.5,
+    'decade_70s': 0.5,
+    'decade_80s': 0.5,
+    'decade_90s': 0.5,
+    'decade_00s': 0.5,
+    'decade_10s': 0.5
+}
+
+I added more weight to energy and valence, because I think those are important factors for a recommended song and less weight to popularity and the decades. I applied the weights to the scaled features and then used those to train the NearestNeighbors model.
+## Creating Charts and Recommendation Function
+I created a Bar Chart and a t-SNE chart to visually graph the input song's features and compare that to the recommended songs features.
+Then I created to function to take an input song and artist, and then search for the closest recommendation songs based on the features. The only caveat was that the recommendation songs could not be by the same artist as the input song.
+The function takes a song, and artist, and number of recommendations and then lists out the recommendations in order and also plots the two charts.
+
 ## Spotify URI to URL Conversion Script
 This script processes a dataset of Spotify track URIs and converts them into clickable URLs for easier access and sharing. 
 
@@ -63,3 +109,4 @@ The song request app is a python file that runs our processing code to allow a u
 ![local_Img](Resources/run_app.png)
 
 When you click on the spotify links to the song recommendations, make sure you right click and "open link in new tab" so you don't lose your app!
+
