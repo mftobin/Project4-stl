@@ -20,15 +20,15 @@ The corresponding dataset contained twenty features:
 * Mode: Song Charting on Billboard Top 100; 0 = Did not Chart; 1 = Did Chart (Int64)
 * Speechiness: Speech to Song Scale; 0 = Least Speech; 1 = Most Speech (Float64)
 * Acousticness: Acoustic to Song Scale; 0 = Least Acoustic; 1 = Most Acoustic; (Float64)
-* Instrumentalness: Instrument to Song Scale; 0 = Least Instrumental, 1 = Most Instrumental; (Float64)
-* Liveness:
-* Valence
-* Tempo
-* Duration_ms
-* Time_Signature
-* Chorus_Hit
-* Sections
-* Popularity
+* Instrumentalness: Instrument to Song Scale; 0 = Least Instrumental; 1 = Most Instrumental (Float64)
+* Liveness: Liveliness of Song Scale; 0 = Least Lively; 1 = Most Lively (Float64)
+* Valence: Positivity of Song Scale; 0 = Least Positive; 1 = Most Positive (Float64)
+* Tempo: Beats per Minute (Float64)
+* Duration_ms: Length in Milliseconds (Int64)
+* Time_Signature: Beats per Measure (Int64)
+* Chorus_Hit: Seconds Before the Chorus (Float64)
+* Sections: Total Sections of Song (Int64)
+* Popularity: Song Charting on Billboard Top 100; 0 = Did not Chart; 1 = Did Chart (Int64)
 * Decades: Decade of Song (Object)
 
 ### Procedure
