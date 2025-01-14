@@ -23,6 +23,15 @@ print(f"DataFrame after removing duplicates: {songs_df.shape}")
 
 songs_df = songs_df.reset_index(drop=True)
 
+# Create dummy variables for the 'decade' column
+decade_dummies = pd.get_dummies(songs_df['decade'], prefix='decade')
+
+# Concatenate the dummy variables with the original DataFrame
+songs_df = pd.concat([songs_df, decade_dummies], axis=1)
+
+# Drop the original 'decade' column 
+songs_df.drop('decade', axis=1, inplace=True)
+
 def convert_uri_to_url(uri):
     if isinstance(uri, str) and uri.startswith("spotify:track:"):
         track_id = uri.split(":")[2]
@@ -34,15 +43,6 @@ songs_df['url'] = songs_df['uri'].apply(convert_uri_to_url)
 # Normalize dataset columns for searching
 songs_df['track_lower'] = songs_df['track'].str.strip().str.lower()
 songs_df['artist_lower'] = songs_df['artist'].str.strip().str.lower()
-
-songs_df['decade'] = songs_df['decade'].replace({
-    '60s': 1960.0,
-    '70s': 1970.0,
-    '80s': 1980.0,
-    '90s': 1990.0,
-    '00s': 2000.0, 
-    '10s': 2010.0
-}).astype(float)
 
 # Select relevant features for the model
 
@@ -58,7 +58,7 @@ features = [
 #  'speechiness',
  'acousticness',
 #  'instrumentalness',
-#  'liveness',
+ 'liveness',
  'valence',
 #  'tempo',
 #  'duration_ms',
@@ -66,7 +66,12 @@ features = [
 #  'chorus_hit',
 #  'sections',
  'popularity',
- 'decade'
+ 'decade_60s',
+ 'decade_70s',
+ 'decade_80s',
+ 'decade_90s',
+ 'decade_00s',
+ 'decade_10s'
  ]
 
 
@@ -82,12 +87,18 @@ X_scaled = pd.DataFrame(
 
 # Feature weighting
 weights = {
-    'danceability': 1.3,
-    'energy': 1.8,
-    'acousticness': 0.8,
+    'danceability': 1.0,
+    'energy': 1.5,
+    'acousticness': 1.0,
+    'liveness': 1.0,
     'valence': 1.5,
     'popularity': 0.5,
-    'decade': 0.4
+    'decade_60s': 0.5,
+    'decade_70s': 0.5,
+    'decade_80s': 0.5,
+    'decade_90s': 0.5,
+    'decade_00s': 0.5,
+    'decade_10s': 0.5
 }
 
 # Apply the weights to the scaled features

@@ -58,6 +58,8 @@ This script processes a dataset of Spotify track URIs and converts them into cli
     * This script is ideal for anyone working with Spotify datasets and looking to create easily shareable track links.
 
 ## Song Request App
-The song request app is a python file that runs our processing code to allow a user to enter a song and artist and the number of recommended songs they would like. For the results, the user will get 1-10 recommendations (depending on how many they selected) with clickable Spotify links. To run the song request app, open the terminal within the song_request_app.py file and type ``` python python song_request_app.py``` and follow the link.
+The song request app is a python file that runs our processing code to allow a user to enter a song and artist and the number of recommended songs they would like. For the results, the user will get 1-10 recommendations (depending on how many they selected) with clickable Spotify links. To run the song request app, open the terminal within the song_request_app.py file and type ``` python song_request_app.py``` and follow the link.
 
 ![local_Img](Resources/run_app.png)
+
+When you click on the spotify links to the song recommendations, make sure you right click and "open link in new tab" so you don't lose your app!
