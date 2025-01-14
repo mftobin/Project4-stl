@@ -32,4 +32,32 @@ The corresponding dataset contained twenty features:
 * Decades: Decade of Song (Object)
 
 ### Procedure
-The dataset was cleaned so that no song duplicates existed. Dummy variables for the categorical feature decades were created. In the end the features that were included in the model were Danceability, Energy, Acousticness, Liveness, Valence, Popularity, and each Decade. After applying weights to each of the features, a K Nearest Neighbors model was created. The model was driven by user input. After a song was entered by the user, provided the song is in the dataset, the eight most similar songs determined by the model were produced. Additionally, an app driven by Flask provided a link to the song on Spotify for the user to listen to.
+The dataset was cleaned so that no song duplicates existed. Dummy variables for the categorical feature decades were created. In the end the features that were included in the model were Danceability, Energy, Acousticness, Liveness, Valence, Popularity, and each Decade. After applying weights to each of the features, a K Nearest Neighbors model was created. The model was driven by user input. After a song was entered by the user, provided the song is in the dataset, the 1-10 most similar songs determined by the model were produced. Additionally, an app driven by Flask provided a link to the song on Spotify for the user to listen to.
+
+## Spotify URI to URL Conversion Script
+This script processes a dataset of Spotify track URIs and converts them into clickable URLs for easier access and sharing. 
+
+# How It Works
+* Conversion Function:
+    * A function (convert_uri_to_url) is defined to transform Spotify track URIs (e.g., spotify:track:...) into clickable URLs (e.g., https://open.spotify.com/track/...).
+    * Only valid Spotify URIs are processed; invalid entries are handled gracefully.
+* Application:
+    * The function is applied to the ‘uri’ column of the dataset, generating a new ‘url’ column with the corresponding Spotify track links.
+* Export:
+    * The updated dataset, including the new ‘url’ column, is saved as a CSV file (updated_file.csv).
+* Verification:
+    * The script displays the first few rows of the updated DataFrame and ensures URLs are fully visible in the console.
+* Usage
+    * Ensure your dataset has a column named ‘uri’ containing valid Spotify track URIs.
+    * Run the script to generate the ‘url’ column and save the updated dataset.
+    * Use the exported CSV file (updated_file.csv) for further analysis or sharing.
+* Key Features
+    * Converts Spotify track URIs to URLs efficiently.
+    * Saves the updated data for future use.
+    * Handles invalid URIs by returning None for such cases.
+    * This script is ideal for anyone working with Spotify datasets and looking to create easily shareable track links.
+
+## Song Request App
+The song request app is a python file that runs our processing code to allow a user to enter a song and artist and the number of recommended songs they would like. For the results, the user will get 1-10 recommendations (depending on how many they selected) with clickable Spotify links. To run the song request app, open the terminal within the song_request_app.py file and type ``` python python song_request_app.py``` and follow the link.
+
+![local_Img](Resources/run_app.png)
