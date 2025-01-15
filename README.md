@@ -110,3 +110,5 @@ The song request app is a python file that runs our processing code to allow a u
 
 When you click on the spotify links to the song recommendations, make sure you right click and "open link in new tab" so you don't lose your app!
 
+## Presentation Slides
+Please follow the following link to access the slides we used for our presentation: https://docs.google.com/presentation/d/1Q-WeawRTJAVewMozBmpWWAokkT4LjqthwjiLZtUe6lQ/edit?usp=sharing
